@@ -49,17 +49,14 @@ async function startServer() {
   // API Routes
   app.post("/api/login", (req, res) => {
     const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, message: "Email required" });
-    }
+    const adminEmail = process.env.ADMIN_EMAIL || "lun@unitx";
     
-    const isAdmin = email === "lun@unitx";
+    // Any email is allowed, role is determined by adminEmail match
+    const role = email === adminEmail ? "admin" : "user";
+    
     res.json({ 
       success: true, 
-      user: { 
-        email, 
-        role: isAdmin ? "admin" : "user" 
-      } 
+      user: { email: email || "Guest", role } 
     });
   });
 

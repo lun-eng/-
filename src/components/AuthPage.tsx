@@ -84,6 +84,12 @@ export default function AuthPage() {
           </button>
 
           <div className="flex-grow flex flex-col justify-center max-w-[420px] mx-auto w-full pt-8">
+            <div className="mb-10">
+              <h1 className="text-3xl font-black font-display tracking-tighter text-white mb-2 italic uppercase">UNITX 学院</h1>
+              <p className="text-sm text-on-surface-variant font-medium tracking-wide">
+                企业级架构实战教程 · 随时随地，直接开启学习
+              </p>
+            </div>
             {/* Tabs */}
             <div className="flex gap-4 p-1 bg-white/5 rounded-xl mb-12">
               <button 
