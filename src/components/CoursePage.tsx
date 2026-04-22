@@ -268,15 +268,15 @@ export default function CoursePage() {
                   <div className="flex items-center gap-8">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full border-2 border-primary/20 p-0.5">
-                        <img src="https://i.pravatar.cc/100?u=chen" alt="Instructor" className="w-full h-full rounded-full object-cover grayscale" />
+                        <img src="https://i.pravatar.cc/100?u=huang" alt="Instructor" className="w-full h-full rounded-full object-cover grayscale" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-white">陈教授</span>
-                        <span className="text-[10px] text-on-surface-variant uppercase tracking-widest font-black">高级架构师</span>
+                        <span className="text-sm font-bold text-white">黄仁康</span>
+                        <span className="text-[10px] text-on-surface-variant uppercase tracking-widest font-black">培训讲师</span>
                       </div>
                     </div>
                     <div className="h-6 w-[1px] bg-white/10" />
-                    <span className="text-xs text-on-surface-variant font-medium">发布于 2024年3月12日</span>
+                    <span className="text-xs text-on-surface-variant font-medium">发布于 2026年4月22日</span>
                   </div>
                 </div>
               </div>
