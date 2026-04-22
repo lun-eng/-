@@ -16,32 +16,16 @@ import {
   Layers,
   Zap,
   Shield,
-  Download,
-  Edit3,
-  Save,
-  Plus,
-  Trash2,
-  Link as LinkIcon,
-  X
+  Download
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { cn } from "../lib/utils";
 import { COURSE_SYLLABUS } from "../constants";
 import { Chapter, Lesson } from "../types";
 
 export default function CoursePage() {
-  const [syllabus, setSyllabus] = useState<Chapter[]>(() => {
-    const saved = localStorage.getItem("unitx_syllabus");
-    return saved ? JSON.parse(saved) : COURSE_SYLLABUS;
-  });
+  const syllabus = COURSE_SYLLABUS; // Locked to constants
   const [activeLesson, setActiveLesson] = useState<Lesson>(syllabus[0].lessons[0]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingLesson, setEditingLesson] = useState<{ chapterId: string, lesson: Lesson } | null>(null);
-  const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
-
-  useEffect(() => {
-    localStorage.setItem("unitx_syllabus", JSON.stringify(syllabus));
-  }, [syllabus]);
 
   const [progress, setProgress] = useState(0); 
   const [currentTime, setCurrentTime] = useState(0);
@@ -96,21 +80,11 @@ export default function CoursePage() {
     <div className="flex bg-black min-h-screen">
       {/* Sidebar */}
       <aside className="w-80 bg-surface-dim border-r border-outline-variant flex flex-col fixed top-20 bottom-0 overflow-y-auto">
-        <div className="p-8 border-b border-outline-variant flex justify-between items-center">
+        <div className="p-8 border-b border-outline-variant">
           <div>
             <h2 className="text-xl font-bold font-display text-white">课程大纲</h2>
             <p className="text-xs text-on-surface-variant mt-1 uppercase tracking-widest font-semibold">企业级培训 v2.4</p>
           </div>
-          <button 
-            onClick={() => setIsEditing(!isEditing)}
-            className={cn(
-              "p-2 rounded-lg transition-all",
-              isEditing ? "bg-primary text-black" : "bg-white/5 text-white hover:bg-white/10"
-            )}
-            title="编辑大纲"
-          >
-            <Edit3 size={18} />
-          </button>
         </div>
 
         <nav className="flex-grow py-4">
@@ -120,39 +94,8 @@ export default function CoursePage() {
                 <div className="flex items-center gap-3">
                   <BookOpen size={18} className="group-hover:text-primary transition-colors" />
                   <span>{chapter.title}</span>
-                  {isEditing && (
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingChapter(chapter);
-                      }}
-                      className="p-1 hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
-                    >
-                      <Edit3 size={12} />
-                    </button>
-                  )}
                 </div>
                 <div className="flex items-center gap-2">
-                  {isEditing && (
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const newLesson: Lesson = {
-                          id: `${chapter.id}.${chapter.lessons.length + 1}`,
-                          title: "新课时",
-                          duration: "00:00",
-                          status: "active"
-                        };
-                        const newSyllabus = syllabus.map(c => 
-                          c.id === chapter.id ? { ...c, lessons: [...c.lessons, newLesson] } : c
-                        );
-                        setSyllabus(newSyllabus);
-                      }}
-                      className="p-1 hover:text-primary transition-colors"
-                    >
-                      <Plus size={14} />
-                    </button>
-                  )}
                   <ChevronRight size={16} />
                 </div>
               </div>
@@ -185,33 +128,6 @@ export default function CoursePage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] opacity-40 font-mono italic">{lesson.duration}</span>
-                        {isEditing && (
-                          <div className="flex items-center gap-1 opacity-0 group-hover/lesson:opacity-100 transition-opacity">
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingLesson({ chapterId: chapter.id, lesson });
-                              }}
-                              className="p-1 hover:text-primary text-xs"
-                            >
-                              <Edit3 size={12} />
-                            </button>
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const newSyllabus = syllabus.map(c => 
-                                  c.id === chapter.id 
-                                    ? { ...c, lessons: c.lessons.filter(l => l.id !== lesson.id) } 
-                                    : c
-                                );
-                                setSyllabus(newSyllabus);
-                              }}
-                              className="p-1 hover:text-red-500 text-xs"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
-                        )}
                       </div>
                     </button>
                   </div>
@@ -343,43 +259,6 @@ export default function CoursePage() {
 
           {/* Video Lesson Footer */}
           <div className="p-12">
-            <AnimatePresence>
-              {editingLesson && (
-                <LessonEditModal 
-                  lesson={editingLesson.lesson}
-                  onClose={() => setEditingLesson(null)}
-                  onSave={(updated) => {
-                    const newSyllabus = syllabus.map(c => 
-                      c.id === editingLesson.chapterId 
-                        ? { 
-                            ...c, 
-                            lessons: c.lessons.map(l => l.id === editingLesson.lesson.id ? updated : l) 
-                          } 
-                        : c
-                    );
-                    setSyllabus(newSyllabus);
-                    if (activeLesson.id === updated.id) {
-                      setActiveLesson(updated);
-                    }
-                    setEditingLesson(null);
-                  }}
-                />
-              )}
-              {editingChapter && (
-                <ChapterEditModal 
-                  chapter={editingChapter}
-                  onClose={() => setEditingChapter(null)}
-                  onSave={(updated) => {
-                    const newSyllabus = syllabus.map(c => 
-                      c.id === editingChapter.id ? updated : c
-                    );
-                    setSyllabus(newSyllabus);
-                    setEditingChapter(null);
-                  }}
-                />
-              )}
-            </AnimatePresence>
-
             <div className="flex justify-between items-start mb-10">
                 <div className="max-w-2xl">
                   <h1 className="text-4xl font-bold font-display text-white mb-4 leading-tight">
@@ -453,209 +332,5 @@ export default function CoursePage() {
         </div>
       </main>
     </div>
-  );
-}
-
-function ChapterEditModal({ 
-  chapter, 
-  onClose, 
-  onSave 
-}: { 
-  chapter: Chapter; 
-  onClose: () => void; 
-  onSave: (updated: Chapter) => void 
-}) {
-  const [title, setTitle] = useState(chapter.title);
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-    >
-      <motion.div 
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        className="bg-surface-container-highest border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
-      >
-        <div className="p-6 border-b border-white/10 flex justify-between items-center">
-          <h3 className="text-xl font-bold text-white flex items-center gap-2">
-            <Edit3 size={20} className="text-primary" />
-            编辑章节名称
-          </h3>
-          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant">
-            <X size={20} />
-          </button>
-        </div>
-        
-        <div className="p-8 space-y-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">章节标题</label>
-            <input 
-              type="text" 
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
-              placeholder="例如：第一章: 基础入门"
-            />
-          </div>
-        </div>
-
-        <div className="p-6 bg-white/5 border-t border-white/10 flex gap-3">
-          <button 
-            onClick={onClose}
-            className="flex-1 py-3 px-4 rounded-lg border border-white/10 text-white font-bold hover:bg-white/5 transition-all"
-          >
-            取消
-          </button>
-          <button 
-            onClick={() => onSave({ ...chapter, title })}
-            className="flex-1 py-3 px-4 rounded-lg bg-primary text-black font-bold hover:brightness-110 transition-all flex items-center justify-center gap-2"
-          >
-            <Save size={18} />
-            保存修改
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function LessonEditModal({ 
-  lesson, 
-  onClose, 
-  onSave 
-}: { 
-  lesson: Lesson; 
-  onClose: () => void; 
-  onSave: (updated: Lesson) => void 
-}) {
-  const [formData, setFormData] = useState<Lesson>(lesson);
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-    >
-      <motion.div 
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        className="bg-surface-container-highest border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
-      >
-        <div className="p-6 border-b border-white/10 flex justify-between items-center">
-          <h3 className="text-xl font-bold text-white flex items-center gap-2">
-            <Edit3 size={20} className="text-primary" />
-            编辑课时内容
-          </h3>
-          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant">
-            <X size={20} />
-          </button>
-        </div>
-        
-        <div className="p-8 space-y-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">课时标题</label>
-            <input 
-              type="text" 
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
-              placeholder="例如：系统架构概览"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">课时副标题</label>
-            <input 
-              type="text" 
-              value={formData.subtitle || ""}
-              onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-              className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
-              placeholder="例如：企业级可扩展性设计"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">课时 ID</label>
-              <input 
-                type="text" 
-                value={formData.id}
-                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
-                placeholder="例如：1.1"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">时长</label>
-              <input 
-                type="text" 
-                value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
-                placeholder="例如：24:00"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
-              <LinkIcon size={12} className="text-primary" />
-              OSS 视频链接
-            </label>
-            <input 
-              type="text" 
-              value={formData.videoUrl || ""}
-              onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-              className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white font-mono text-xs focus:outline-none focus:border-primary transition-colors"
-              placeholder="https://oss-region.example.com/video.mp4"
-            />
-            <p className="text-[10px] text-on-surface-variant/60 italic">支持直接播放的 MP4/WebM 格式链接</p>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">课程介绍 / 描述</label>
-            <textarea 
-              value={formData.description || ""}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors min-h-[120px] resize-none text-sm"
-              placeholder="输入本章节的详细介绍..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">状态</label>
-            <select 
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors appearance-none"
-            >
-              <option value="active">进行中 (Active)</option>
-              <option value="completed">已完成 (Completed)</option>
-              <option value="locked">未锁定 (Locked)</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="p-6 bg-white/5 border-t border-white/10 flex gap-3">
-          <button 
-            onClick={onClose}
-            className="flex-1 py-3 px-4 rounded-lg border border-white/10 text-white font-bold hover:bg-white/5 transition-all"
-          >
-            取消
-          </button>
-          <button 
-            onClick={() => onSave(formData)}
-            className="flex-1 py-3 px-4 rounded-lg bg-primary text-black font-bold hover:brightness-110 transition-all flex items-center justify-center gap-2"
-          >
-            <Save size={18} />
-            保存修改
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>
   );
 }

@@ -12,14 +12,14 @@ export const COURSE_SYLLABUS: Chapter[] = [
         description: "本章节将深入探讨现代企业级系统的核心架构原则。我们将从分层架构入手，分析如何通过模块化设计提升系统的可扩展性与维护性。重点包括微服务演进、数据一致性策略以及在高并发环境下的性能优化手段。",
         duration: "24:00", 
         status: "active",
-        videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" 
+        videoUrl: "https://unitx-data.oss-cn-shenzhen.aliyuncs.com/%E8%A7%86%E9%A2%91/UnitX%E5%9F%BA%E7%A1%80%E4%BB%8B%E7%BB%8D/UnitX%E7%A1%AC%E4%BB%B6%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D.mp4?OSSAccessKeyId=LTAI5t7jrAXpg1woEAz1KV8o&Expires=1836850645&Signature=PewxXaXxVGasUhuveDUabYKs%2BW8%3D" 
       },
       { 
         id: "1.2", 
         title: "环境搭建指南", 
         duration: "18:00", 
         status: "completed",
-        videoUrl: "https://www.w3schools.com/html/movie.mp4"
+        videoUrl: "https://unitx-data.oss-cn-shenzhen.aliyuncs.com/%E8%A7%86%E9%A2%91/UnitX%E5%9F%BA%E7%A1%80%E4%BB%8B%E7%BB%8D/UnitX%E7%A1%AC%E4%BB%B6%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D.mp4?OSSAccessKeyId=LTAI5t7jrAXpg1woEAz1KV8o&Expires=1836850645&Signature=PewxXaXxVGasUhuveDUabYKs%2BW8%3D"
       },
       { 
         id: "1.3", 
