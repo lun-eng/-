@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Source Han Sans CN", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Source Han Sans CN", "Inter", sans-serif;
+
+  --color-primary: #a0c0ff;
+  --color-on-primary: #000000;
+  
+  --color-surface: #000000;
+  --color-surface-dim: #0a0a0a;
+  --color-surface-container: #111111;
+  --color-surface-container-high: #1a1a1a;
+  --color-surface-container-highest: #222222;
+  
+  --color-on-surface: #ffffff;
+  --color-on-surface-variant: #a1a1a1;
+  
+  --color-outline: #333333;
+  --color-outline-variant: #1a1a1a;
+
+  --radius-xl: 0.5rem;
+  --radius-lg: 0.375rem;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-sans;
+  }
+}
