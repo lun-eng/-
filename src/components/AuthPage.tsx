@@ -11,10 +11,24 @@ export default function AuthPage() {
   const { login } = useAuth();
   const mode = searchParams.get("mode") || "login";
   const [isLogin, setIsLogin] = useState(mode === "login");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
 
-  const handleAuth = () => {
-    login();
-    navigate("/courses");
+  const handleAuth = async () => {
+    if (!email) {
+      setError("请输入账号");
+      return;
+    }
+    const result = await login(email);
+    if (result.success) {
+      if (result.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/courses");
+      }
+    } else {
+      setError("登录失败");
+    }
   };
 
   const toggleMode = (newIsLogin: boolean) => {
@@ -102,15 +116,18 @@ export default function AuthPage() {
                   className="space-y-8"
                 >
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-on-surface-variant tracking-[0.2em] uppercase">手机号</label>
+                    <label className="text-[10px] font-black text-on-surface-variant tracking-[0.2em] uppercase">账号 (Email)</label>
                     <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
                       <input 
-                        type="text" 
-                        placeholder="请输入您的手机号"
+                        type="email" 
+                        placeholder="请输入您的邮箱地址"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-white placeholder:text-white/20"
                       />
                     </div>
+                    {error && <p className="text-red-400 text-xs font-bold">{error}</p>}
                   </div>
                   <button 
                     onClick={handleAuth}

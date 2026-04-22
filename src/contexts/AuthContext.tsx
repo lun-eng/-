@@ -2,29 +2,47 @@ import React, { createContext, useContext, useState } from "react";
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  login: () => void;
+  user: { email: string; role: string } | null;
+  login: (email: string) => Promise<{ success: boolean; role?: string }>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem("unitx_logged_in") === "true";
+  const [user, setUser] = useState<{ email: string; role: string } | null>(() => {
+    const saved = localStorage.getItem("unitx_user");
+    return saved ? JSON.parse(saved) : null;
   });
+  const isLoggedIn = !!user;
 
-  const login = () => {
-    localStorage.setItem("unitx_logged_in", "true");
-    setIsLoggedIn(true);
+  const login = async (email: string) => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        localStorage.setItem("unitx_user", JSON.stringify(data.user));
+        setUser(data.user);
+        return { success: true, role: data.user.role };
+      }
+      return { success: false };
+    } catch (error) {
+      console.error("Login failed:", error);
+      return { success: false };
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem("unitx_logged_in");
-    setIsLoggedIn(false);
+    localStorage.removeItem("unitx_user");
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
